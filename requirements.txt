@@ -8,6 +8,10 @@ wheel>=0.29
 numpy
 pandas
 scikit-learn
+seaborn
+uvicorn
+fastapi
+joblib
 
 # tests/linter
 black
