@@ -36,6 +36,9 @@ uninstal:
 	@cat files.txt | xargs rm -rf
 	@rm -f files.txt
 
+run_api:
+	uvicorn api.fast:app --reload
+
 count_lines:
 	@find ./ -name '*.py' -exec  wc -l {} \; | sort -n| awk \
         '{printf "%4s %s\n", $$1, $$2}{s+=$$0}END{print s}'
