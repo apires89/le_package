@@ -11,6 +11,7 @@ scikit-learn
 seaborn
 uvicorn
 fastapi
+joblib
 
 # tests/linter
 black
