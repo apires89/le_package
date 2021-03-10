@@ -13,6 +13,11 @@ def get_clean_data():
         "gs://leading-enterprise-wagon-apires89/data/final.csv")
     return df
 
+def prepare_data(df):
+    df = df.drop(columns=['sector', 'region', 'company_size'])
+    df = df.astype(float)
+    return df
+
 if __name__ == "__main__":
   df = get_full_data()
   df2 = get_clean_data()
