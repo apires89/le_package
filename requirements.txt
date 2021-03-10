@@ -12,6 +12,7 @@ seaborn
 uvicorn
 fastapi
 joblib
+xgboost
 
 # tests/linter
 black
