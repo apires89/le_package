@@ -12,6 +12,7 @@ seaborn
 uvicorn
 fastapi
 joblib
+xgboost
 
 # tests/linter
 black
@@ -31,14 +32,3 @@ six>=1.14
 joblib
 memoized-property
 termcolor
-
-
-#http://127.0.0.1:8000/predict_clusters/?digital_transformation=2&employee_engagement=3&employee_satisfaction=4&innovation=5&internationalization=4&market_competitiveness=2&people_management=2&people_structure=3&recruitment=4&training_and_development=5&work_processes=4
-
-
-http://127.0.0.1:8000/predict_clusters/?digital_transformation=0&employee_engagement=3&employee_satisfaction=0&innovation=5&internationalization=0&market_competitiveness=0&people_management=0&people_structure=3&recruitment=0&training_and_development=5&work_processes=0
-
-http://127.0.0.1:8000/predict_cluster/?digital_transformation=2&employee_engagement=3&employee_satisfaction=2&innovation=2&internationalization=2&market_competitiveness=2&people_management=2&people_structure=3&recruitment=2&training_and_development=2&work_processes=2
-
-
-http://127.0.0.1:8000/predict_cluster/?digital_transformation=2&employee_engagement=3&employee_satisfaction=2&innovation=3&internationalization=2&market_competitiveness=3&people_management=5&people_structure=3&recruitment=2&training_and_development=2&work_processes=2
