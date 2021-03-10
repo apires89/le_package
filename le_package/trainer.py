@@ -1,17 +1,16 @@
 import joblib
 from termcolor import colored
-import mlflow
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from le_package.utils import compute_rmse
 from le_package.data import get_clean_data,prepare_data
 from sklearn.ensemble import VotingClassifier
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import GradientBoostingClassifier
 from xgboost import XGBClassifier
+from sklearn.model_selection import cross_validate
 
 
 # MLFLOW_URI = "https://mlflow.lewagon.co/"
@@ -37,36 +36,33 @@ class Trainer():
             n_estimators=100,
             learning_rate=0.1
         )
-
         #XGBoost
         xgbc = XGBClassifier()
-
         #Naive Bayes Gaussian
         gaussian = GaussianNB()
-        #gradient boosting
-        gradient_boost_pipe = Pipeline([
-            ('gradient_boost', GradientBoostingClassifier(
-                n_estimators=100,
-                learning_rate=0.1
-            ))
-        ])
-        #creating xgbc pipeline
-        xgbc_pipe = Pipeline([
-            ('xgbc', XGBClassifier())
-        ])
-        #creating the Naive Bayes Gaussian pipeline
-        gaussian_pipe = Pipeline([
-            ('gaussian', GaussianNB())
-        ])
-        ## grouping pre voting pipeline
-        preproc_pipe = Pipeline([
-          ('gradient_boost',gradient_boost_pipe),
-          ('xgbc',xgbc_pipe),
-          ('gaussian', gaussian_pipe)
-        ])
         ### applying voting classifier to preproc
+        columns = ["digital_transformation",
+         "employee_engagement",
+         "employee_satisfaction",
+         "innovation" ,
+         "internationalization",
+         "market_competitiveness",
+         "people_management",
+         "people_structure",
+         "recruitment",
+         "training_and_development",
+         "work_processes"]
+
+        pipe_prepoc = Pipeline([
+          ('minmax',MinMaxScaler())
+          ])
+
+        features_transformer = ColumnTransformer(
+          [('ctransf',pipe_prepoc,columns)],
+          remainder="drop")
+
         self.pipeline = Pipeline([
-            ('preproc', preproc_pipe),
+            ('features_transformer', features_transformer),
             ('voting_classifier', VotingClassifier(
                 estimators=[("gradient_boost", gradient_boost),
                             ("xgbc", xgbc), ("gaussian", gaussian)],
@@ -87,9 +83,12 @@ class Trainer():
         return trained_model
 
     def evaluate(self):
-        y_pred = self.pipeline.predict(self.X_train)
-        rmse = compute_rmse(y_pred, self.y_train)
-        return rmse
+        ### evaluation method for voting classifing
+        #y_pred = self.pipeline.predict(self.X_test)
+        ensemble_results = cross_validate(self.pipeline, self.X_train, self.y_train, cv=3)
+        print("CV mean results: ", ensemble_results['test_score'].mean())
+        #rmse = compute_rmse(y_pred, self.y_test)
+        #return rmse
 
 
 if __name__ == "__main__":
@@ -101,8 +100,6 @@ if __name__ == "__main__":
     # hold out
     trainer = Trainer(X=df.drop(columns="cluster"), y=df["cluster"])
     # train
-    trainer.set_pipeline()
     trainer.run()
     # evaluate
     trainer.evaluate()
-    print(trainer.evaluate())
