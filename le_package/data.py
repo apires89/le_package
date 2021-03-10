@@ -21,4 +21,5 @@ def prepare_data(df):
 if __name__ == "__main__":
   df = get_full_data()
   df2 = get_clean_data()
-  print(df2.head(1))
+  df3 = prepare_data(df2)
+  print(df3.shape)

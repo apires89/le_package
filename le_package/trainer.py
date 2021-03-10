@@ -11,6 +11,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import GradientBoostingClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import cross_validate
+import pandas as pd
 
 
 # MLFLOW_URI = "https://mlflow.lewagon.co/"
@@ -53,16 +54,16 @@ class Trainer():
          "training_and_development",
          "work_processes"]
 
-        pipe_prepoc = Pipeline([
-          ('minmax',MinMaxScaler())
-          ])
+        # pipe_prepoc = Pipeline([
+        #   ('minmax',MinMaxScaler())
+        #   ])
 
-        features_transformer = ColumnTransformer(
-          [('ctransf',pipe_prepoc,columns)],
-          remainder="drop")
+        # features_transformer = ColumnTransformer(
+        #   [('ctransf',pipe_prepoc,columns)],
+        #   remainder="drop")
 
         self.pipeline = Pipeline([
-            ('features_transformer', features_transformer),
+            # ('features_transformer', features_transformer),
             ('voting_classifier', VotingClassifier(
                 estimators=[("gradient_boost", gradient_boost),
                             ("xgbc", xgbc), ("gaussian", gaussian)],
@@ -90,16 +91,54 @@ class Trainer():
         #rmse = compute_rmse(y_pred, self.y_test)
         #return rmse
 
+    def save_model(self):
+        """Save the model into a .joblib format"""
+        joblib.dump(self.pipeline, 'model_le.joblib')
+        print(colored("model.joblib saved locally", "green"))
+
+    # def save_model_to_gcp(reg):
+    #     """Save the model into a .joblib and upload it on Google Storage /models folder
+    #     HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
+    #     from sklearn.externals import joblib
+    #     local_model_name = 'model_le.joblib'
+    #     # saving the trained model to disk (which does not really make sense
+    #     # if we are running this code on GCP, because then this file cannot be accessed once the code finished its execution)
+    #     joblib.dump(reg, local_model_name)
+    #     print("saved model.joblib locally")
+    #     client = storage.Client().bucket(BUCKET_NAME)
+    #     storage_location = f"models/{MODEL_NAME}/{MODEL_VERSION}/{local_model_name}"
+    #     blob = client.blob(storage_location)
+    #     blob.upload_from_filename(local_model_name)
+    #     print("uploaded model.joblib to gcp cloud storage under \n => {}".format(
+    #         storage_location))
+
+
 
 if __name__ == "__main__":
   # get data
     df = get_clean_data()
     # clean data
-    prepare_data(df)
+    df = prepare_data(df)
     # set X and y
     # hold out
     trainer = Trainer(X=df.drop(columns="cluster"), y=df["cluster"])
     # train
-    trainer.run()
+    trained_model = trainer.run()
     # evaluate
     trainer.evaluate()
+    trainer.save_model()
+    # X = pd.DataFrame(dict(
+    #     digital_transformation=[float(1)],
+    #     employee_engagement=[float(1)],
+    #     employee_satisfaction=[float(1)],
+    #     innovation=[float(1)],
+    #     internationalization=[float(1)],
+    #     market_competitiveness=[float(1)],
+    #     people_management=[float(1)],
+    #     people_structure=[float(1)],
+    #     recruitment=[float(1)],
+    #     training_and_development=[float(1)],
+    #     work_processes=[float(1)],
+
+    # ))
+    # print(trained_model.predict(X))

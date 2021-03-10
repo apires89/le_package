@@ -20,6 +20,22 @@ BUCKET_FOLDER='data'
 # BUCKET_FILE_NAME=another_file_name_if_I_so_desire.csv
 BUCKET_FILE_NAME=$(shell basename ${LOCAL_PATH})
 
+##### Package params  - - - - - - - - - - - - - - - - - - -
+
+PACKAGE_NAME=le_package
+FILENAME=trainer
+
+##### Job - - - - - - - - - - - - - - - - - - - - - - - - -
+
+JOB_NAME=leading_enterprise_training_pipeline_$(shell date +'%Y%m%d_%H%M%S')
+
+
+# REGION=europe-west1
+
+PYTHON_VERSION=3.7
+FRAMEWORK=scikit-learn
+RUNTIME_VERSION=1.15
+
 upload_data:
 	@gsutil cp ${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${BUCKET_FILE_NAME}
 
@@ -90,3 +106,7 @@ pypi_test:
 
 pypi:
 	@twine upload dist/* -u $(PYPI_USERNAME)
+
+run_locally:
+	@python -m ${PACKAGE_NAME}.${FILENAME}
+
